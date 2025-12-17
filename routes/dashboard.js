@@ -5,16 +5,32 @@ const Selection = require('../models/Selection');
 
 // Middleware to check if user is logged in
 const requireAuth = (req, res, next) => {
+  console.log('🔐 Auth check - Session data:', {
+    userId: req.session.userId,
+    username: req.session.username,
+    isAdmin: req.session.isAdmin,
+    sessionId: req.sessionID
+  });
   if (!req.session.userId) {
+    console.log('❌ Auth failed: No userId in session, redirecting to login');
     return res.redirect('/login');
   }
+  console.log('✅ Auth passed');
   next();
 };
 
 // Dashboard page
 router.get('/', requireAuth, async (req, res) => {
   try {
+    console.log('📊 Loading dashboard for user:', req.session.userId);
     const user = await User.findById(req.session.userId);
+    if (!user) {
+      console.log('❌ User not found in database:', req.session.userId);
+      req.session.destroy();
+      return res.redirect('/login');
+    }
+    console.log('✅ User found:', user.username);
+    
     const selection = await Selection.findOne();
     const isSelectionActive = selection && selection.isActive;
     
@@ -31,6 +47,7 @@ router.get('/', requireAuth, async (req, res) => {
       success: null
     });
   } catch (error) {
+    console.error('❌ Dashboard error:', error);
     res.render('dashboard', {
       user: null,
       isSelectionActive: false,

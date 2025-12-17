@@ -21,17 +21,38 @@ app.use(session({
   cookie: { 
     secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax' // Helps with cross-site requests
   }
 }));
 
+// Log session configuration on startup
+console.log('Session configuration:', {
+  secure: process.env.NODE_ENV === 'production',
+  httpOnly: true,
+  sameSite: 'lax',
+  nodeEnv: process.env.NODE_ENV
+});
+
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/secret-santa', {
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/secret-santa';
+console.log('Attempting MongoDB connection...');
+console.log('MongoDB URI present:', !!process.env.MONGODB_URI);
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+.then(() => {
+  console.log('✅ Connected to MongoDB');
+  console.log('MongoDB connection state:', mongoose.connection.readyState);
+})
+.catch(err => {
+  console.error('❌ MongoDB connection error:', err);
+  console.error('Error details:', {
+    name: err.name,
+    message: err.message
+  });
+});
 
 // Import routes
 const authRoutes = require('./routes/auth');
