@@ -7,6 +7,9 @@ const path = require('path');
 
 const app = express();
 
+// Trust proxy (required for Render and other hosting platforms)
+app.set('trust proxy', 1);
+
 // Middleware
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -35,9 +38,28 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax' // Helps with cross-site requests
+    sameSite: 'lax', // Helps with cross-site requests
+    path: '/' // Ensure cookie is sent for all paths
   }
 }));
+
+// Debug middleware to log session and cookie info
+app.use((req, res, next) => {
+  if (req.path === '/dashboard' || req.path === '/login' || req.path === '/register') {
+    console.log('🍪 Cookie info:', {
+      cookies: req.cookies,
+      signedCookies: req.signedCookies,
+      sessionId: req.sessionID,
+      sessionUserId: req.session?.userId,
+      headers: {
+        cookie: req.headers.cookie ? 'present' : 'missing',
+        'x-forwarded-proto': req.headers['x-forwarded-proto'],
+        host: req.headers.host
+      }
+    });
+  }
+  next();
+});
 
 // Log session configuration on startup
 console.log('Session configuration:', {
@@ -45,7 +67,8 @@ console.log('Session configuration:', {
   secure: process.env.NODE_ENV === 'production',
   httpOnly: true,
   sameSite: 'lax',
-  nodeEnv: process.env.NODE_ENV
+  nodeEnv: process.env.NODE_ENV,
+  trustProxy: app.get('trust proxy')
 });
 
 // Connect to MongoDB
