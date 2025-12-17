@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const path = require('path');
 
 const app = express();
@@ -13,11 +14,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Session configuration
+// MongoDB connection and session store setup
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/secret-santa';
+console.log('Attempting MongoDB connection...');
+console.log('MongoDB URI present:', !!process.env.MONGODB_URI);
+
+// Create session store (will connect when MongoDB is ready)
+const sessionStore = MongoStore.create({
+  mongoUrl: mongoUri,
+  collectionName: 'sessions'
+});
+
+// Session configuration with MongoDB store
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secret-santa-secret-key',
   resave: false,
   saveUninitialized: false,
+  store: sessionStore,
   cookie: { 
     secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     httpOnly: true,
@@ -28,16 +41,14 @@ app.use(session({
 
 // Log session configuration on startup
 console.log('Session configuration:', {
+  store: 'MongoDB (connect-mongo)',
   secure: process.env.NODE_ENV === 'production',
   httpOnly: true,
   sameSite: 'lax',
   nodeEnv: process.env.NODE_ENV
 });
 
-// MongoDB connection
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/secret-santa';
-console.log('Attempting MongoDB connection...');
-console.log('MongoDB URI present:', !!process.env.MONGODB_URI);
+// Connect to MongoDB
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true

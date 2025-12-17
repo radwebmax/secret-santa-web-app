@@ -21,24 +21,49 @@ router.get('/login', (req, res) => {
 // Login handler
 router.post('/login', async (req, res) => {
   try {
+    console.log('=== LOGIN START ===');
     const { username, password } = req.body;
+    console.log('Login attempt for username:', username ? `${username.substring(0, 3)}...` : 'missing');
+    
     const user = await User.findOne({ username });
     
     if (!user) {
+      console.log('❌ Login failed: User not found');
       return res.render('login', { error: 'Invalid username or password' });
     }
+    console.log('✅ User found:', user.username);
     
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log('❌ Login failed: Password mismatch');
       return res.render('login', { error: 'Invalid username or password' });
     }
+    console.log('✅ Password verified');
     
+    console.log('Setting up session...');
     req.session.userId = user._id;
     req.session.username = user.username;
     req.session.isAdmin = user.isAdmin;
+    console.log('✅ Session data set:', {
+      userId: req.session.userId,
+      username: req.session.username,
+      isAdmin: req.session.isAdmin,
+      sessionId: req.sessionID
+    });
     
-    res.redirect('/dashboard');
+    // Save session explicitly before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error('❌ Session save error:', err);
+        return res.render('login', { error: 'Failed to create session. Please try again.' });
+      }
+      console.log('✅ Session saved successfully');
+      console.log('Redirecting to dashboard...');
+      res.redirect('/dashboard');
+      console.log('=== LOGIN SUCCESS ===');
+    });
   } catch (error) {
+    console.error('❌ LOGIN ERROR:', error);
     res.render('login', { error: 'An error occurred. Please try again.' });
   }
 });
