@@ -89,16 +89,29 @@ mongoose.connect(mongoUri, {
 });
 
 // Import routes
+console.log('📦 Loading route files...');
 const authRoutes = require('./routes/auth');
+console.log('✅ Auth routes loaded');
 const dashboardRoutes = require('./routes/dashboard');
+console.log('✅ Dashboard routes loaded');
 const adminRoutes = require('./routes/admin');
+console.log('✅ Admin routes loaded');
 const apiRoutes = require('./routes/api');
+console.log('✅ API routes loaded');
 
 // Routes
+console.log('🔗 Registering routes...');
 app.use('/', authRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/admin', adminRoutes);
 app.use('/api', apiRoutes);
+
+// Debug: Log registered routes
+console.log('📋 All routes registered:');
+console.log('  - / (auth routes)');
+console.log('  - /dashboard/* (dashboard routes including /username)');
+console.log('  - /admin/* (admin routes)');
+console.log('  - /api/* (api routes)');
 
 // Home page redirect
 app.get('/', (req, res) => {
@@ -107,6 +120,15 @@ app.get('/', (req, res) => {
   } else {
     res.redirect('/login');
   }
+});
+
+// Debug: Catch-all for unhandled routes
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.path.includes('username')) {
+    console.log('⚠️ Unhandled POST request to:', req.path);
+    console.log('Available routes should include: /dashboard/username');
+  }
+  next();
 });
 
 const PORT = process.env.PORT || 3000;

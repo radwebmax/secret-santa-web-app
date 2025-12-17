@@ -23,9 +23,28 @@
 
         <div class="dashboard-content">
             <div class="info-card">
+                <h2>🎄 Welcome to Secret Santa!</h2>
+                <div class="info-item" style="margin-bottom: 15px;">
+                    <p style="font-size: 1.1em; line-height: 1.6;">
+                        <strong>Budget:</strong> 500 UAH<br>
+                        Feel free to leave links in your wishes! If you have no specific wishes, just write "No wishes" or "Surprise me".
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-card">
                 <h2>Your Information</h2>
                 <div class="info-item">
-                    <strong>Username:</strong> <%= user.username %>
+                    <strong>Username:</strong> 
+                    <% if (!isSelectionActive || !user.assignedTo) { %>
+                        <span id="usernameDisplay" style="display: inline;"><%= user.username %></span>
+                        <input type="text" id="usernameInput" value="<%= user.username %>" style="display: none; padding: 4px 8px; border: 2px solid #667eea; border-radius: 5px; font-size: 1em; margin-left: 5px; max-width: 200px;">
+                        <button id="editUsernameBtn" class="btn-copy" onclick="toggleUsernameEdit()" title="Edit username" style="margin-left: 5px;">✏️</button>
+                        <button id="saveUsernameBtn" class="btn-copy" onclick="saveUsername()" title="Save username" style="display: none; margin-left: 5px; background: #28a745;">💾</button>
+                        <button id="cancelUsernameBtn" class="btn-copy" onclick="cancelUsernameEdit()" title="Cancel" style="display: none; margin-left: 5px; background: #dc3545;">❌</button>
+                    <% } else { %>
+                        <%= user.username %>
+                    <% } %>
                 </div>
                 <div class="info-item">
                     <strong>Your ID:</strong> <span class="user-id"><%= user.userId %></span>
@@ -211,6 +230,121 @@
                 alert('An error occurred');
             }
         }
+
+        // Username editing functions
+        let originalUsername = '<%= user.username %>';
+        
+        function toggleUsernameEdit() {
+            const display = document.getElementById('usernameDisplay');
+            const input = document.getElementById('usernameInput');
+            const editBtn = document.getElementById('editUsernameBtn');
+            const saveBtn = document.getElementById('saveUsernameBtn');
+            const cancelBtn = document.getElementById('cancelUsernameBtn');
+            
+            if (display && input && editBtn && saveBtn && cancelBtn) {
+                display.style.display = 'none';
+                input.style.display = 'inline';
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline';
+                cancelBtn.style.display = 'inline';
+                input.focus();
+                input.select();
+            }
+        }
+        
+        function cancelUsernameEdit() {
+            const display = document.getElementById('usernameDisplay');
+            const input = document.getElementById('usernameInput');
+            const editBtn = document.getElementById('editUsernameBtn');
+            const saveBtn = document.getElementById('saveUsernameBtn');
+            const cancelBtn = document.getElementById('cancelUsernameBtn');
+            
+            if (display && input && editBtn && saveBtn && cancelBtn) {
+                input.value = originalUsername;
+                display.style.display = 'inline';
+                input.style.display = 'none';
+                editBtn.style.display = 'inline';
+                saveBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+            }
+        }
+        
+        async function saveUsername() {
+            const input = document.getElementById('usernameInput');
+            if (!input) return;
+            
+            const newUsername = input.value.trim();
+            
+            if (!newUsername) {
+                alert('Username cannot be empty');
+                return;
+            }
+            
+            if (newUsername.length < 3) {
+                alert('Username must be at least 3 characters long');
+                return;
+            }
+            
+            if (newUsername.length > 30) {
+                alert('Username must be no more than 30 characters long');
+                return;
+            }
+            
+            if (newUsername === originalUsername) {
+                cancelUsernameEdit();
+                return;
+            }
+            
+            try {
+                const response = await fetch('/dashboard/username', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ username: newUsername })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    originalUsername = newUsername;
+                    const display = document.getElementById('usernameDisplay');
+                    if (display) {
+                        display.textContent = newUsername;
+                    }
+                    cancelUsernameEdit();
+                    // Show success message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = 'Username updated successfully!';
+                    messageDiv.style.marginTop = '10px';
+                    const infoCard = document.querySelector('.info-card');
+                    if (infoCard) {
+                        infoCard.appendChild(messageDiv);
+                        setTimeout(() => {
+                            messageDiv.remove();
+                        }, 3000);
+                    }
+                } else {
+                    alert(data.message || 'Failed to update username');
+                }
+            } catch (error) {
+                alert('An error occurred while updating username');
+            }
+        }
+        
+        // Allow Enter key to save username, Escape to cancel
+        document.addEventListener('DOMContentLoaded', () => {
+            const usernameInput = document.getElementById('usernameInput');
+            if (usernameInput) {
+                usernameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        saveUsername();
+                    } else if (e.key === 'Escape') {
+                        cancelUsernameEdit();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

@@ -136,5 +136,77 @@ router.post('/remove-exclusion', requireAuth, async (req, res) => {
   }
 });
 
+// Test route to verify router is working
+router.get('/test-route', (req, res) => {
+  res.json({ success: true, message: 'Dashboard router is working!' });
+});
+
+// Update username
+router.post('/username', (req, res, next) => {
+  console.log('📝 Username route middleware hit!');
+  console.log('Request method:', req.method);
+  console.log('Request path:', req.path);
+  console.log('Request url:', req.url);
+  next();
+}, requireAuth, async (req, res) => {
+  console.log('📝 Username route handler hit!');
+  try {
+    console.log('📝 Username update request received');
+    const { username } = req.body;
+    
+    if (!username) {
+      return res.json({ success: false, message: 'Username is required' });
+    }
+    
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.json({ success: false, message: 'User not found' });
+    }
+    
+    // Validate username
+    const trimmedUsername = username.trim();
+    if (trimmedUsername.length < 3) {
+      return res.json({ success: false, message: 'Username must be at least 3 characters long' });
+    }
+    
+    if (trimmedUsername.length > 30) {
+      return res.json({ success: false, message: 'Username must be no more than 30 characters long' });
+    }
+    
+    const selection = await Selection.findOne();
+    // Only allow username change if selection is not active, OR if user doesn't have an assignment yet
+    if (selection && selection.isActive && user.assignedTo) {
+      return res.json({ success: false, message: 'Selection has already started. Cannot modify username.' });
+    }
+    
+    // Check if username already exists
+    const existingUser = await User.findOne({ username: trimmedUsername });
+    if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+      return res.json({ success: false, message: 'Username already taken' });
+    }
+    
+    // Update username
+    user.username = trimmedUsername;
+    await user.save();
+    console.log('✅ Username updated:', trimmedUsername);
+    
+    // Update session
+    req.session.username = user.username;
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+      }
+    });
+    
+    res.json({ success: true, message: 'Username updated successfully' });
+  } catch (error) {
+    console.error('❌ Update username error:', error);
+    res.json({ success: false, message: `An error occurred: ${error.message}` });
+  }
+});
+
+// Log that username route is registered
+console.log('✅ Dashboard routes loaded, including /username route');
+
 module.exports = router;
 
