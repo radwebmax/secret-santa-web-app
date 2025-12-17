@@ -1,0 +1,16 @@
+# Netlify configuration
+# Note: Netlify is better suited for static sites
+# For full Express apps, Render is recommended
+
+[build]
+  command = "npm install"
+  publish = "public"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+

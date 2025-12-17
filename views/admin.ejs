@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Secret Santa</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>⚙️ Admin Panel</h1>
+            <div class="header-actions">
+                <a href="/dashboard" class="btn btn-secondary">My Dashboard</a>
+                <a href="/logout" class="btn btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="admin-controls">
+                <div class="control-card">
+                    <h2>Selection Control</h2>
+                    <% if (selection && selection.isActive) { %>
+                        <div class="status-badge active">Selection Active</div>
+                        <p>Selection started on: <%= new Date(selection.startedAt).toLocaleString() %></p>
+                        <button id="resetBtn" class="btn btn-danger">Reset Selection</button>
+                    <% } else { %>
+                        <div class="status-badge inactive">Selection Inactive</div>
+                        <p>Click the button below to start the Secret Santa selection process.</p>
+                        <button id="startBtn" class="btn btn-primary btn-large">Start Secret Santa Selection</button>
+                    <% } %>
+                    <div id="controlMessage" class="message"></div>
+                </div>
+            </div>
+
+            <div class="users-section">
+                <h2>All Users</h2>
+                <div class="users-grid">
+                    <% users.forEach(user => { %>
+                        <div class="user-card" data-user-id="<%= user._id %>">
+                            <div class="user-card-header">
+                                <h3><%= user.username %></h3>
+                                <% if (session && user._id.toString() !== session.userId) { %>
+                                    <button class="btn-delete-user" onclick="deleteUser('<%= user._id %>', '<%= user.username %>')" title="Delete user">
+                                        🗑️
+                                    </button>
+                                <% } %>
+                            </div>
+                            <div class="user-info">
+                                <p><strong>ID:</strong> <span class="user-id"><%= user.userId %></span></p>
+                                <p><strong>Wish:</strong> <span class="<%= user.wish && user.wish.trim() ? 'wish-status added' : 'wish-status missing' %>">
+                                    <%= user.wish && user.wish.trim() ? 'Wish is added' : 'Wish is missing' %>
+                                </span></p>
+                                <p><strong>Excluded:</strong> <%= user.excludedUsers ? user.excludedUsers.length : 0 %> user(s)</p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+                <div id="deleteMessage" class="message"></div>
+            </div>
+
+            <% if (pairings && pairings.length > 0) { %>
+                <div class="pairings-section">
+                    <h2>Pairings</h2>
+                    <div class="pairings-list">
+                        <% pairings.forEach(pairing => { %>
+                            <div class="pairing-card">
+                                <p><strong><%= pairing.santa.username %></strong> → <strong><%= pairing.recipient.username %></strong></p>
+                                <p class="pairing-wish">Wish: <span class="<%= pairing.recipient.wish && pairing.recipient.wish.trim() ? 'wish-status added' : 'wish-status missing' %>">
+                                    <%= pairing.recipient.wish && pairing.recipient.wish.trim() ? 'Wish is added' : 'Wish is missing' %>
+                                </span></p>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Start selection
+        document.getElementById('startBtn')?.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to start the Secret Santa selection? This cannot be undone without resetting.')) {
+                return;
+            }
+            
+            const messageDiv = document.getElementById('controlMessage');
+            messageDiv.textContent = 'Starting selection...';
+            messageDiv.className = 'message info';
+            
+            try {
+                const response = await fetch('/admin/start-selection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.success ? 'message success' : 'message error';
+                
+                if (data.success) {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                }
+            } catch (error) {
+                messageDiv.textContent = 'An error occurred';
+                messageDiv.className = 'message error';
+            }
+        });
+
+        // Reset selection
+        document.getElementById('resetBtn')?.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to reset the selection? All pairings will be cleared.')) {
+                return;
+            }
+            
+            const messageDiv = document.getElementById('controlMessage');
+            messageDiv.textContent = 'Resetting selection...';
+            messageDiv.className = 'message info';
+            
+            try {
+                const response = await fetch('/admin/reset-selection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.success ? 'message success' : 'message error';
+                
+                if (data.success) {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                }
+            } catch (error) {
+                messageDiv.textContent = 'An error occurred';
+                messageDiv.className = 'message error';
+            }
+        });
+
+        // Delete user
+        window.deleteUser = async function(userId, username) {
+            if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+                return;
+            }
+            
+            const messageDiv = document.getElementById('deleteMessage');
+            messageDiv.textContent = 'Deleting user...';
+            messageDiv.className = 'message info';
+            messageDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch(`/admin/user/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.success ? 'message success' : 'message error';
+                
+                if (data.success) {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 5000);
+                }
+            } catch (error) {
+                messageDiv.textContent = 'An error occurred while deleting the user';
+                messageDiv.className = 'message error';
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        };
+    </script>
+</body>
+</html>
+

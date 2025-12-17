@@ -1,0 +1,900 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Auth Pages */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-card h1 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #667eea;
+}
+
+.auth-card h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #555;
+    font-weight: 400;
+}
+
+.auth-form {
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+#wish {
+    width: 100%!important;
+    max-width: 100%!important;
+    min-width: 100%!important;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #888;
+    font-size: 0.85em;
+    padding-bottom: 20px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-outline {
+    background: transparent;
+    color: rgba(110, 102, 201, 1);
+    border: 2px solid rgba(255, 255, 255, 1);
+}
+
+a.btn.btn-outline {
+    border-color: rgba(255, 255, 255, 1);
+    color: rgba(110, 102, 201, 1);
+}
+
+.btn-outline:hover {
+    background: white;
+    color: #667eea;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-large {
+    padding: 16px 32px;
+    font-size: 18px;
+}
+
+.alert {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-error {
+    background: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.auth-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+/* Dashboard */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h1 {
+    color: #667eea;
+    font-size: 2em;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.dashboard-content {
+    display: grid;
+    gap: 30px;
+}
+
+.info-card,
+.wish-card,
+.exclusion-card,
+.result-card,
+.control-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.info-card h2,
+.wish-card h2,
+.exclusion-card h2,
+.result-card h2,
+.control-card h2 {
+    margin-bottom: 20px;
+    color: #667eea;
+    font-size: 1.5em;
+}
+.exclusion-card .info-note{
+    margin-bottom: 10px;
+}
+.info-item {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+#startBtn {
+    margin-top: 15px;
+}
+.user-id {
+    font-family: 'Courier New', monospace;
+    background: #f0f0f0;
+    padding: 1px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.btn-copy {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 0.9em;
+}
+
+.btn-copy:hover {
+    background: #5568d3;
+}
+
+.info-note {
+    margin-top: 15px;
+    color: #666;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+.result-card {
+    position: relative;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #667eea 100%) border-box;
+    border: 4px solid transparent;
+    border-radius: 12px;
+    background-size: 100%, 300% 300%;
+    animation: gradient-border 4s ease infinite;
+}
+
+@keyframes gradient-border {
+    0% {
+        background-position: 0% 0%, 0% 50%;
+    }
+    50% {
+        background-position: 0% 0%, 100% 50%;
+    }
+    100% {
+        background-position: 0% 0%, 0% 50%;
+    }
+}
+
+@keyframes gradient-border {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.assignment-info {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.assignment-label {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.assignment-name {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.assignment-wish {
+    font-size: 1.3em;
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+.assignment-wish.no-wish {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.input-group input {
+    flex: 1;
+    min-width: 0; /* Allows input to shrink if needed */
+}
+
+.input-group .btn {
+    width: auto;
+    min-width: 120px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.excluded-list {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #e0e0e0;
+}
+
+.excluded-list h3 {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.excluded-list ul {
+    list-style: none;
+}
+
+.excluded-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.btn-remove {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.btn-remove:hover {
+    background: #c82333;
+}
+
+.message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Admin Panel */
+.admin-controls {
+    margin-bottom: 30px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.status-badge.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.inactive {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.users-section,
+.pairings-section {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.users-section h2,
+.pairings-section h2 {
+    margin-bottom: 20px;
+    color: #667eea;
+    font-size: 1.5em;
+}
+
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.user-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.user-card:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.user-card h3 {
+    color: #667eea;
+    margin: 0;
+    font-size: 1.2em;
+    flex: 1;
+}
+
+.btn-delete-user {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 36px;
+}
+
+.btn-delete-user:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.btn-delete-user:active {
+    transform: scale(0.95);
+}
+
+.user-info p {
+    margin-bottom: 8px;
+    font-size: 0.95em;
+    color: #555;
+}
+
+.wish-status {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.9em;
+}
+
+.wish-status.added {
+    background: #d4edda;
+    color: #155724;
+}
+
+.wish-status.missing {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.pairings-list {
+    display: grid;
+    gap: 15px;
+}
+
+.pairing-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.pairing-card p {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.pairing-wish {
+    color: #666;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    /* Body and container adjustments */
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+
+    /* Auth Pages */
+    .auth-container {
+        padding: 10px;
+        min-height: calc(100vh - 20px);
+    }
+
+    .auth-card {
+        padding: 25px 20px;
+        border-radius: 10px;
+    }
+
+    .auth-card h1 {
+        font-size: 2em;
+        margin-bottom: 8px;
+    }
+
+    .auth-card h2 {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.5em;
+        margin: 0;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+    }
+
+    /* Dashboard Content */
+    .dashboard-content {
+        gap: 20px;
+    }
+
+    /* Cards */
+    .info-card,
+    .wish-card,
+    .exclusion-card,
+    .result-card,
+    .control-card,
+    .users-section,
+    .pairings-section {
+        padding: 20px 15px;
+        border-radius: 10px;
+    }
+
+    .info-card h2,
+    .wish-card h2,
+    .exclusion-card h2,
+    .result-card h2,
+    .control-card h2,
+    .users-section h2,
+    .pairings-section h2 {
+        font-size: 1.3em;
+        margin-bottom: 15px;
+    }
+
+    /* Info Items */
+    .info-item {
+        font-size: 1em;
+        margin-bottom: 12px;
+    }
+
+    .user-id {
+        font-size: 0.9em;
+        padding: 1px 8px;
+        word-break: break-all;
+    }
+
+    .btn-copy {
+        margin-left: 5px;
+        padding: 4px 8px;
+        font-size: 0.85em;
+    }
+
+    .info-note {
+        font-size: 0.85em;
+        margin-top: 10px;
+    }
+
+    /* Result Card / Assignment */
+    .assignment-info {
+        padding: 15px 0;
+    }
+
+    .assignment-label {
+        font-size: 1em;
+        margin-bottom: 8px;
+    }
+
+    .assignment-name {
+        font-size: 1.8em;
+        margin: 15px 0;
+    }
+
+    .assignment-wish {
+        font-size: 1.1em;
+        margin-top: 15px;
+        padding: 15px;
+    }
+
+    /* Forms */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-size: 0.95em;
+        margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 10px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .form-group small {
+        font-size: 0.8em;
+        margin-top: 4px;
+        padding-bottom: 15px;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 20px;
+        font-size: 15px;
+        width: 100%;
+    }
+
+    .btn-large {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+
+    .btn-copy,
+    .btn-remove,
+    .btn-delete-user {
+        width: auto;
+    }
+
+    /* Input Groups */
+    .input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .input-group input {
+        width: 100%;
+    }
+
+    .input-group .btn {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Excluded List */
+    .excluded-list {
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+
+    .excluded-list h3 {
+        font-size: 1.1em;
+        margin-bottom: 12px;
+    }
+
+    .excluded-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .excluded-list li span {
+        word-break: break-all;
+    }
+
+    .btn-remove {
+        width: 100%;
+        padding: 8px;
+    }
+
+    /* Messages */
+    .message {
+        padding: 10px;
+        font-size: 0.9em;
+        margin-top: 12px;
+    }
+
+    /* Admin Panel */
+    .admin-controls {
+        margin-bottom: 20px;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        font-size: 0.9em;
+        margin-bottom: 12px;
+    }
+
+    .users-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .user-card {
+        padding: 15px;
+    }
+
+    .user-card h3 {
+        font-size: 1.1em;
+    }
+
+    .user-info p {
+        font-size: 0.9em;
+        margin-bottom: 6px;
+    }
+
+    .wish-status {
+        font-size: 0.85em;
+        padding: 1px 8px;
+    }
+
+    .pairings-list {
+        gap: 12px;
+    }
+
+    .pairing-card {
+        padding: 15px;
+    }
+
+    .pairing-card p {
+        font-size: 1em;
+        margin-bottom: 8px;
+    }
+
+    .pairing-wish {
+        font-size: 0.95em;
+        margin-top: 8px;
+    }
+}
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+
+    .auth-card {
+        padding: 20px 15px;
+    }
+
+    .auth-card h1 {
+        font-size: 1.8em;
+    }
+
+    .dashboard-header {
+        padding: 12px 15px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.3em;
+    }
+
+    .info-card,
+    .wish-card,
+    .exclusion-card,
+    .result-card,
+    .control-card,
+    .users-section,
+    .pairings-section {
+        padding: 15px 12px;
+    }
+
+    .assignment-name {
+        font-size: 1.5em;
+    }
+
+    .assignment-wish {
+        font-size: 1em;
+        padding: 12px;
+    }
+
+    .user-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .btn-delete-user {
+        align-self: flex-end;
+    }
+}
+
+#resetBtn {
+    margin-top: 15px;
+}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Secret Santa</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>🎅 Secret Santa Dashboard</h1>
+            <div class="header-actions">
+                <% if (user.isAdmin) { %>
+                    <a href="/admin" class="btn btn-secondary">Admin Panel</a>
+                <% } %>
+                <a href="/logout" class="btn btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="info-card">
+                <h2>Your Information</h2>
+                <div class="info-item">
+                    <strong>Username:</strong> <%= user.username %>
+                </div>
+                <div class="info-item">
+                    <strong>Your ID:</strong> <span class="user-id"><%= user.userId %></span>
+                    <button class="btn-copy" onclick="copyUserId()" title="Copy ID">📋</button>
+                </div>
+                <p class="info-note">Share this ID with others so they can exclude you from their Secret Santa selection.</p>
+            </div>
+
+            <% if (isSelectionActive && assignedUser) { %>
+                <div class="result-card">
+                    <h2>🎁 Your Secret Santa Assignment</h2>
+                    <div class="assignment-info">
+                        <p class="assignment-label">You are giving a gift to:</p>
+                        <p class="assignment-name"><%= assignedUser.username %></p>
+                        <% if (assignedUser.wish) { %>
+                            <p class="assignment-label">Their wish:</p>
+                            <p class="assignment-wish"><%= assignedUser.wish %></p>
+                        <% } else { %>
+                            <p class="assignment-wish no-wish">No wish specified</p>
+                        <% } %>
+                    </div>
+                </div>
+            <% } else if (isSelectionActive) { %>
+                <div class="info-card">
+                    <h2>⏳ Selection in Progress</h2>
+                    <p>The Secret Santa selection has been completed. Please refresh the page to see your assignment.</p>
+                </div>
+            <% } else { %>
+                <div class="wish-card">
+                    <h2>Your Wish</h2>
+                    <form id="wishForm">
+                        <div class="form-group">
+                            <label for="wish">What would you like for Secret Santa?</label>
+                            <small>You can only create one wish</small>
+                            <textarea id="wish" name="wish" rows="4" maxlength="500" placeholder="Enter your wish here..."><%= user.wish || '' %></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Wish</button>
+                    </form>
+                    <div id="wishMessage" class="message"></div>
+                </div>
+
+                <div class="exclusion-card">
+                    <h2>Exclude Users</h2>
+                    <p class="info-note">Enter a user ID to exclude them from being your Secret Santa recipient.</p>
+                    <form id="excludeForm">
+                        <div class="form-group">
+                            <label for="excludeUserId">User ID</label>
+                            <div class="input-group">
+                                <input type="text" id="excludeUserId" name="userId" placeholder="Enter user ID" required>
+                                <button type="submit" class="btn btn-primary">Exclude</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="excludeMessage" class="message"></div>
+
+                    <% if (user.excludedUsers && user.excludedUsers.length > 0) { %>
+                        <div class="excluded-list">
+                            <h3>Excluded Users:</h3>
+                            <ul>
+                                <% user.excludedUsers.forEach(userId => { %>
+                                    <li>
+                                        <span>ID: <%= userId %></span>
+                                        <button class="btn-remove" onclick="removeExclusion('<%= userId %>')">Remove</button>
+                                    </li>
+                                <% }); %>
+                            </ul>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Copy user ID to clipboard
+        function copyUserId() {
+            const userId = '<%= user.userId %>';
+            navigator.clipboard.writeText(userId).then(() => {
+                alert('User ID copied to clipboard!');
+            });
+        }
+
+        // Wish form submission
+        document.getElementById('wishForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const wish = document.getElementById('wish').value;
+            const messageDiv = document.getElementById('wishMessage');
+            
+            try {
+                const response = await fetch('/dashboard/wish', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ wish })
+                });
+                
+                const data = await response.json();
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.success ? 'message success' : 'message error';
+                
+                if (data.success) {
+                    setTimeout(() => {
+                        messageDiv.textContent = '';
+                        messageDiv.className = 'message';
+                    }, 3000);
+                }
+            } catch (error) {
+                messageDiv.textContent = 'An error occurred';
+                messageDiv.className = 'message error';
+            }
+        });
+
+        // Exclude form submission
+        document.getElementById('excludeForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('excludeUserId').value;
+            const messageDiv = document.getElementById('excludeMessage');
+            
+            try {
+                const response = await fetch('/dashboard/exclude', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ userId })
+                });
+                
+                const data = await response.json();
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.success ? 'message success' : 'message error';
+                
+                if (data.success) {
+                    document.getElementById('excludeUserId').value = '';
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
+            } catch (error) {
+                messageDiv.textContent = 'An error occurred';
+                messageDiv.className = 'message error';
+            }
+        });
+
+        // Remove exclusion
+        async function removeExclusion(userId) {
+            if (!confirm('Remove this exclusion?')) return;
+            
+            try {
+                const response = await fetch('/dashboard/remove-exclusion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ userId })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('An error occurred');
+            }
+        }
+    </script>
+</body>
+</html>
+
