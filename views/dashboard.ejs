@@ -53,7 +53,9 @@
                     <h2>⏳ Selection in Progress</h2>
                     <p>The Secret Santa selection has been completed. Please refresh the page to see your assignment.</p>
                 </div>
-            <% } else { %>
+            <% } %>
+
+            <% if (!isSelectionActive || !user.assignedTo) { %>
                 <div class="wish-card">
                     <h2>Your Wish</h2>
                     <form id="wishForm">
@@ -94,6 +96,22 @@
                             </ul>
                         </div>
                     <% } %>
+                </div>
+            <% } %>
+
+            <% if (isSelectionActive && user.excludedUsers && user.excludedUsers.length > 0) { %>
+                <div class="exclusion-card">
+                    <h2>Your Exclusions</h2>
+                    <p class="info-note">These are the users you excluded from being your Secret Santa recipient.</p>
+                    <div class="excluded-list">
+                        <ul>
+                            <% user.excludedUsers.forEach(userId => { %>
+                                <li>
+                                    <span>ID: <%= userId %></span>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
                 </div>
             <% } %>
         </div>

@@ -28,6 +28,7 @@
                         <div class="status-badge active">Selection Active</div>
                         <p>Selection started on: <%= new Date(selection.startedAt).toLocaleString() %></p>
                         <button id="resetBtn" class="btn btn-danger">Reset Selection</button>
+                        <button id="deleteBtn" class="btn btn-danger" style="margin-top: 10px;">Delete Selection</button>
                     <% } else { %>
                         <div class="status-badge inactive">Selection Inactive</div>
                         <p>Click the button below to start the Secret Santa selection process.</p>
@@ -55,7 +56,13 @@
                                 <p><strong>Wish:</strong> <span class="<%= user.wish && user.wish.trim() ? 'wish-status added' : 'wish-status missing' %>">
                                     <%= user.wish && user.wish.trim() ? 'Wish is added' : 'Wish is missing' %>
                                 </span></p>
-                                <p><strong>Excluded:</strong> <%= user.excludedUsers ? user.excludedUsers.length : 0 %> user(s)</p>
+                                <p><strong>Excluded:</strong> 
+                                    <% if (user.excludedUsers && user.excludedUsers.length > 0) { %>
+                                        <span class="user-id"><%= user.excludedUsers.join(', ') %></span>
+                                    <% } else { %>
+                                        <span class="wish-status missing">None</span>
+                                    <% } %>
+                                </p>
                             </div>
                         </div>
                     <% }); %>
@@ -117,7 +124,7 @@
 
         // Reset selection
         document.getElementById('resetBtn')?.addEventListener('click', async () => {
-            if (!confirm('Are you sure you want to reset the selection? All pairings will be cleared.')) {
+            if (!confirm('Are you sure you want to reset the selection? All pairings will be cleared, but the selection record will remain.')) {
                 return;
             }
             
@@ -127,6 +134,39 @@
             
             try {
                 const response = await fetch('/admin/reset-selection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.success ? 'message success' : 'message error';
+                
+                if (data.success) {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                }
+            } catch (error) {
+                messageDiv.textContent = 'An error occurred';
+                messageDiv.className = 'message error';
+            }
+        });
+
+        // Delete selection completely
+        document.getElementById('deleteBtn')?.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to DELETE the selection completely? This will remove all pairings and the selection record. This action cannot be undone.')) {
+                return;
+            }
+            
+            const messageDiv = document.getElementById('controlMessage');
+            messageDiv.textContent = 'Deleting selection...';
+            messageDiv.className = 'message info';
+            
+            try {
+                const response = await fetch('/admin/delete-selection', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

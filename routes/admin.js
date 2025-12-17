@@ -123,6 +123,20 @@ router.post('/reset-selection', requireAdmin, async (req, res) => {
   }
 });
 
+// Delete selection completely
+router.post('/delete-selection', requireAdmin, async (req, res) => {
+  try {
+    await Selection.deleteMany({});
+    await Pairing.deleteMany({});
+    await User.updateMany({}, { $set: { assignedTo: null, assignedBy: null } });
+    
+    res.json({ success: true, message: 'Selection deleted completely' });
+  } catch (error) {
+    console.error('Delete selection error:', error);
+    res.json({ success: false, message: 'An error occurred' });
+  }
+});
+
 // Secret Santa selection algorithm with exclusions
 function performSecretSantaSelection(users) {
   if (users.length < 2) {

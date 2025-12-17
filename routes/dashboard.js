@@ -65,7 +65,8 @@ router.post('/wish', requireAuth, async (req, res) => {
     const user = await User.findById(req.session.userId);
     
     const selection = await Selection.findOne();
-    if (selection && selection.isActive) {
+    // Allow wish updates if selection is not active, OR if user doesn't have an assignment yet
+    if (selection && selection.isActive && user.assignedTo) {
       return res.json({ success: false, message: 'Selection has already started. Cannot modify wish.' });
     }
     
@@ -85,7 +86,8 @@ router.post('/exclude', requireAuth, async (req, res) => {
     const user = await User.findById(req.session.userId);
     
     const selection = await Selection.findOne();
-    if (selection && selection.isActive) {
+    // Allow exclusion updates if selection is not active, OR if user doesn't have an assignment yet
+    if (selection && selection.isActive && user.assignedTo) {
       return res.json({ success: false, message: 'Selection has already started. Cannot modify exclusions.' });
     }
     
@@ -120,7 +122,8 @@ router.post('/remove-exclusion', requireAuth, async (req, res) => {
     const user = await User.findById(req.session.userId);
     
     const selection = await Selection.findOne();
-    if (selection && selection.isActive) {
+    // Allow exclusion removal if selection is not active, OR if user doesn't have an assignment yet
+    if (selection && selection.isActive && user.assignedTo) {
       return res.json({ success: false, message: 'Selection has already started. Cannot modify exclusions.' });
     }
     
